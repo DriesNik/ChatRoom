@@ -14,9 +14,9 @@ namespace ChatRoom
     class Server
     {        
         public static Queue<string> messageQueue = new Queue<string>();
-        public static Dictionary<TcpClient, string> clientDictionary = new Dictionary<TcpClient, string>();
+        public static Dictionary<string, int> clientDictionary = new Dictionary<string, int>();
         static TcpListener server;
-
+        //int indexNumber;
         public  void Main()
         {
             
@@ -27,36 +27,31 @@ namespace ChatRoom
                 IPAddress localAddr = IPAddress.Parse("127.0.0.1");              
                 server = new TcpListener(localAddr, port);                
                 server.Start();
-                //Byte[] bytes = new Byte[256];
-                //string data = null;
-                //Thread listenThread = new Thread(ListenThread);
-
                 Console.WriteLine("Waiting for a connection... ");
-
-                //data = null;                    
-
-                Console.WriteLine("after network");
-
-
                 Thread help = new Thread (ListenThread);
                 help.Start();
+                //Thread messaging = new Thread(Messages);
+                //messaging.Start();
+
                 for (;;)
                 {
-                    
-                    
-                    
                     try
                     {
+                        
                         Byte[] bytes = new Byte[256];
                         string data = null;
                         NetworkStream stream = server.AcceptTcpClient().GetStream();
-                        Console.WriteLine("writing bit");
+                        Console.WriteLine("A user has joined");
                         int i;
                         while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                         {
                             data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                            Console.WriteLine("Received: {0}", data);   
+                            Console.WriteLine("Received: {0}", data);
                             byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
+                            foreach (var indexNumber in clientDictionary)
+                            {
+                                stream.Write(msg, 0, msg.Length);
+                            }
                             stream.Write(msg, 0, msg.Length);
                             Console.WriteLine("Sent: {0}", data);
                         }
@@ -65,10 +60,10 @@ namespace ChatRoom
                     {
                         Console.WriteLine("user has disconnected");
                     }
-                   
+
                     //Messager();
                     Console.WriteLine("client close bit");
-                    //server.AcceptTcpClient().Close();
+                    server.AcceptTcpClient().Close();
                 }
 
             }
@@ -88,18 +83,59 @@ namespace ChatRoom
         }
 
         static void ListenThread()
-        {            
-                //while (true)
-                //    {
-                    server.AcceptTcpClient();
-                    Console.WriteLine("A User has joined your server!");
-                    //}           
+        {
+           int  indexNumber = 0;
+            while (true)
+            {
+                server.AcceptTcpClient();
+                //TcpClient client = server.AcceptTcpClient();
+                
+                //string MyDictKey = client.Client.RemoteEndPoint.ToString();
+                //clientDictionary.Add(MyDictKey, indexNumber);
+                Console.WriteLine("A User has joined your server!");
+                TcpClient client = server.AcceptTcpClient();
+
+                string MyDictKey = client.Client.RemoteEndPoint.ToString();
+                clientDictionary.Add(MyDictKey, indexNumber);
+                indexNumber++;
+            }
         }
            
         
-        public static void Data_IN(object client_socket)
+        public static void Messages()
         {
+            for (;;)
+            {
+                server.Start();
+                try
+                {
+                    Byte[] bytes = new Byte[256];
+                    string data = null;
+                    NetworkStream stream = server.AcceptTcpClient().GetStream();
+                    Console.WriteLine("A user has joined");
+                    int i;
+                    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                    {
+                        data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                        Console.WriteLine("Received: {0}", data);
+                        byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
+                        foreach (var indexNumber in clientDictionary)
+                        {
+                            stream.Write(msg, 0, msg.Length);
+                        }
+                        stream.Write(msg, 0, msg.Length);
+                        Console.WriteLine("Sent: {0}", data);
+                    }
+                }
+                catch (System.IO.IOException)
+                {
+                    Console.WriteLine("user has disconnected");
+                }
 
+                //Messager();
+                Console.WriteLine("client close bit");
+                server.AcceptTcpClient().Close();
+            }
         }
         //public static void Messager()
         //{

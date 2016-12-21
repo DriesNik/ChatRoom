@@ -19,15 +19,7 @@ namespace ChatRoom
         //    SendRegistrationPacket();
         //}
 
-        public UserData(Socket clientSocket)
-        {
-            this.clientSocket = clientSocket;
-            ID = Guid.NewGuid().ToString();
-            clientThread = new Thread(Server.Data_IN);
-            clientThread.Start(clientSocket);
-            //SendRegistrationPacket();
-        }
-
+     
         //public void SendRegistrationPacket()
         //{
         //    Packet packet = new Packet(PacketType.Registration, "server");
