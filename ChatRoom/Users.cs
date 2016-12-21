@@ -9,7 +9,7 @@ namespace ChatRoom
     class Users : IUsers
     {
         private string _name;
-        private string _status;
+        //private string _status;
 
         public Users(string name)
         {
