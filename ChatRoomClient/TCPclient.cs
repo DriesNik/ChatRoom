@@ -2,13 +2,14 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using System.Net.Sockets;
 
 namespace ChatRoomClient
 {
     public class TCPclient
     {
-
+        NetworkStream stream;
         public void Connect()
         {
             string name;
@@ -16,6 +17,7 @@ namespace ChatRoomClient
             {
                 Console.WriteLine("What is your name?");
                 name = Console.ReadLine();
+                
                 Console.WriteLine("Enter your message");
                 
                     string server;                    
@@ -23,19 +25,20 @@ namespace ChatRoomClient
                     string message;
                     Int32 port = 8002;
                     TcpClient client = new TcpClient(server, port);
-                    NetworkStream stream = client.GetStream();
                 
+                    stream = client.GetStream();
+                var t = Task.Run(() => GetMessage());
                 while (true)
                 {
                     message = Console.ReadLine();
                     string output = (name + ": " + message);
                     Byte[] data = Encoding.ASCII.GetBytes(output);
                     stream.Write(data, 0, data.Length);
-                    
-                    string responseData = String.Empty;                    
-                    Int32 bytes = stream.Read(data, 0, data.Length);
-                    responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-                    Console.WriteLine("{0}", responseData);                    
+
+                    //string responseData = String.Empty;
+                    //Int32 bytes = stream.Read(data, 0, data.Length);
+                    //responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
+                    //Console.WriteLine("{0}", responseData);
                 }
                                       
             }
@@ -43,13 +46,24 @@ namespace ChatRoomClient
             {
                 Console.WriteLine("ArgumentNullException: {0}", e);
             }
-            catch (SocketException e)
+            catch (System.IO.IOException)
             {
-                Console.WriteLine("SocketException: {0}", e);
+                Console.WriteLine("Disconnected");
             }
 
             Console.WriteLine("\n Press Enter to continue...");
             Console.Read();
+        }
+        public void GetMessage()
+        {
+            Byte[] bytes = new Byte[256];
+            string data = null;
+            int i;
+            while ((i = stream.Read(bytes, 0, 256)) != 1)
+            {
+                data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                Console.WriteLine("{0}", data);                
+           }
         }
     }
 }
