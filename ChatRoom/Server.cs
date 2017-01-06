@@ -15,19 +15,25 @@ namespace ChatRoom
     {        
         public static Queue<string> messageQueue = new Queue<string>();
         public static Dictionary<string, int> clientDictionary = new Dictionary<string, int>();
+        public static List<Users> users;
         public static TcpListener server;
-        public static NetworkStream stream;
-        public static byte[] message;
+        //public static System.IO.StreamWriter file;
+
+
         public  void Main()
         {
             try
             {
+                users = new List<Users>();
                 Int32 port = 8002;
                 IPAddress localAddr = IPAddress.Parse("127.0.0.1");              
                 server = new TcpListener(localAddr, port);
                 server.Start();
+                //MakeLog();
                 Console.WriteLine("Waiting for a connection... ");
-                var t = Task.Run(() =>ListenThread());
+                var t = Task.Run(() => ListenThread());
+                var z = Task.Run(() => Messages());
+                
                 t.Wait();   
             }
             catch (SocketException e)
@@ -43,46 +49,67 @@ namespace ChatRoom
             Console.WriteLine("\nHit enter to continue...");
             Console.Read();
         }
+        //public void MakeLog()
+        //{
+        //    file = new System.IO.StreamWriter(@"Logs.txt");
+        //}
         static void ListenThread()
         {
             while (true)
             {
                 while (server.Pending() == true)
                 {
-                    stream = server.AcceptTcpClient().GetStream();
-                    var message = Task.Run(() => Messages());
                     Console.WriteLine("A User has joined your server!");
+                    UserJoin();
+                    Users user = new Users(server.AcceptTcpClient().GetStream());
+                    users.Add(user);
+                    
+                    
+                    var q = Task.Run(() => user.Reading());
+                    //Parallel.Invoke(Messages, user.Reading);
                 }
+            }
+        }
+        public static void Writing(string uno)
+        {
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(@"Logs.txt", true))
+            {
+                file.WriteLine(uno);
+            }
+            
+        }
+        public static void UserJoin()
+        {
+            foreach (Users user in users)
+            {
+                user.Update("A User has joined the channel");
             }
         }
         public static void Messages()
         {
-            for (;;)
+            while (true)
             {
-                try
+                if (messageQueue.Count > 0)
                 {
-                    Byte[] bytes = new Byte[256];
-                    string data = null;
-                    int i;                    
-                    while ((i = stream.Read(bytes, 0, 256)) != 1)
+                    string words = messageQueue.Dequeue();
+                    Writing(words);
+                    
+                    
+                    foreach (Users user in users)
                     {
-                        data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                        Console.WriteLine("Received: {0}", data);
-                        messageQueue.Enqueue(data);
-
-                        byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
-                        message = msg;
-                        stream.Write(message, 0, message.Length);
-
-                        Console.WriteLine("Sent: {0}", data);
+                        
+                        user.Update(words);
                     }
                 }
-                catch (System.IO.IOException)
+                else
                 {
-                    Console.WriteLine("User has disconnected");
-                } 
-                server.AcceptTcpClient().Close();
+
+                }
             }
+            
         }
+        
+       
     }
 }

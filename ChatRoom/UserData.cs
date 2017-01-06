@@ -11,20 +11,6 @@ namespace ChatRoom
         public Thread clientThread;
         public string ID;
 
-        //public UserData()
-        //{
-        //    ID = Guid.NewGuid().ToString();
-        //    clientThread = new Thread(Server.Data_IN);
-        //    clientThread.Start(clientSocket);
-        //    SendRegistrationPacket();
-        //}
-
-     
-        //public void SendRegistrationPacket()
-        //{
-        //    Packet packet = new Packet(PacketType.Registration, "server");
-        //    packet.GeneralData.Add(ID);
-        //    clientSocket.Send(packet.ToBytes());
-        //}
+        
     }
 }

@@ -63,7 +63,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Status.cs" />
-    <Compile Include="Tcplistener.cs" />
+    <Compile Include="Server.cs" />
     <Compile Include="UserData.cs" />
     <Compile Include="Users.cs" />
   </ItemGroup>
