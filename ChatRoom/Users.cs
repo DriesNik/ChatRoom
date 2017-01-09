@@ -30,6 +30,33 @@ namespace ChatRoom
                 Console.WriteLine("Error");
             }
         }
+        public void StartUp()
+        {
+            //var naming = Task.Run(() => GetName());
+            //naming.Wait();
+            
+                var q = Task.Run(() => Reading());
+            
+        }
+        public string GetName()
+        {
+            Byte[] bytes = new Byte[256];
+            string data = null;
+            int i;
+            try
+            {
+                i = accept.Read(bytes, 0, bytes.Length);
+                {
+                    data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                    Console.WriteLine("success");
+                }
+            }
+            catch (IOException)
+            {
+                Console.WriteLine("Errors");
+            }
+            return data;
+        }
         public void Reading()
         {
             Byte[] bytes = new Byte[256];

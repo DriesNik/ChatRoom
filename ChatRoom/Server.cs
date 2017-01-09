@@ -14,10 +14,9 @@ namespace ChatRoom
     class Server
     {        
         public static Queue<string> messageQueue = new Queue<string>();
-        public static Dictionary<string, int> clientDictionary = new Dictionary<string, int>();
+        public static Dictionary<string, Users> clientDictionary = new Dictionary<string, Users>();
         public static List<Users> users;
         public static TcpListener server;
-        //public static System.IO.StreamWriter file
         public  void Main()
         {
             try
@@ -27,7 +26,6 @@ namespace ChatRoom
                 IPAddress localAddr = IPAddress.Parse("127.0.0.1");              
                 server = new TcpListener(localAddr, port);
                 server.Start();
-                //MakeLog();
                 Console.WriteLine("Waiting for a connection. ");
                 var listen = Task.Run(() => ListenThread());
                 var messaging = Task.Run(() => Messages());
@@ -42,9 +40,16 @@ namespace ChatRoom
                 Console.WriteLine("The Server has closed.");
                 server.Stop();
             }
-            //Console.WriteLine("end server");
+            
             Console.WriteLine("\nHit enter to continue.");
             Console.Read();
+        }
+        static void AddingUserThread( Users info)
+        {
+            var q = Task.Run(() => clientDictionary.Add(info.GetName(), info));
+            q.Wait();          
+            info.StartUp();
+            UserJoin();
         }
         static void ListenThread()
         {
@@ -53,28 +58,32 @@ namespace ChatRoom
                 while (server.Pending() == true)
                 {
                     Console.WriteLine("A User has joined your server!");
-                    UserJoin();
-                    Users user = new Users(server.AcceptTcpClient().GetStream());
-                    users.Add(user);
-                    var q = Task.Run(() => user.Reading());
                     
+                    Users user = new Users(server.AcceptTcpClient().GetStream());
+                    var q = Task.Run(() => AddingUserThread(/*user.GetName(),*/ user));
+                    //user.StartUp();
+                    //clientDictionary.Add(user.GetName(),user);
+
+                    //users.Add(user);
+                    //var q = Task.Run(() => user.Reading());
+
                 }
             }
         }
-        public static void Writing(string uno)
+        public static void Writing(string text)
         {
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(@"Logs.txt", true))
             {
-                file.WriteLine(uno);
+                file.WriteLine(text);
             }
-            
         }
         public static void UserJoin()
         {
-            foreach (Users user in users)
+            foreach (var users in clientDictionary.Values)
             {
-                user.Update("A User has joined the channel.");
+                
+                users.Update("A User has joined the channel.");
             }
         }
         public static void Messages()
@@ -85,9 +94,9 @@ namespace ChatRoom
                 {
                     string words = messageQueue.Dequeue();
                     Writing(words);
-                    foreach (Users user in users)
+                    foreach (var users in clientDictionary.Values)
                     {
-                        user.Update(words);
+                        users.Update(words);
                     }
                 }
                 else

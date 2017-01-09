@@ -20,23 +20,27 @@ namespace ChatRoomClient
         }
         public void Connect()
         {
-            string name;
+            string sendName;
             try
             {
+                string server;
+                server = "127.0.0.1";
+                string message;
+                Int32 port = 8002;
+                client = new TcpClient(server, port);
+                stream = client.GetStream();
                 Console.WriteLine("What is your name?");
-                name = Console.ReadLine();
+                    sendName = Console.ReadLine();
+                    
+                    Byte[] nameData = Encoding.ASCII.GetBytes(sendName);
+                    stream.Write(nameData, 0, nameData.Length);   
                 Console.WriteLine("Enter your message");
-                    string server;                    
-                    server = "127.0.0.1";
-                    string message;
-                    Int32 port = 8002;
-                     client = new TcpClient(server, port);
-                    stream = client.GetStream();
+                    
                 var User = Task.Run(() => GetMessage());
                 while (true)
                 {
                     message = Console.ReadLine();
-                    string output = (name + ": " + message);
+                    string output = (sendName + ": " + message);
                     Byte[] data = Encoding.ASCII.GetBytes(output);
                     stream.Write(data, 0, data.Length);
                     Console.WriteLine("message sent");
@@ -53,28 +57,31 @@ namespace ChatRoomClient
         }
         public void GetMessage()
         {
-            if (stream.CanRead)
+            while (true)
             {
-                try
+                if (stream.CanRead)
                 {
-                    Byte[] bytes = new Byte[256];
-                    string data = null;
-                    int i;
-                    while (stream.DataAvailable != true)
+                    try
                     {
-                        i = stream.Read(bytes, 0, bytes.Length);
-                        data = Encoding.ASCII.GetString(bytes, 0, i);
-                        Console.WriteLine("{0}", data);
+                        Byte[] bytes = new Byte[256];
+                        string data = null;
+                        int i;
+                        while (stream.DataAvailable == true)
+                        {
+                            i = stream.Read(bytes, 0, bytes.Length);
+                            data = Encoding.ASCII.GetString(bytes, 0, i);
+                            Console.WriteLine("{0}", data);
+                        }
+                    }
+                    catch (System.IO.IOException)
+                    {
+                        Console.WriteLine("Server Connection Lost");
                     }
                 }
-                catch (System.IO.IOException)
+                else
                 {
-                    Console.WriteLine("Server Connection Lost");
-                }
-            }
-            else
-            {
 
+                }
             }
         }
     }
