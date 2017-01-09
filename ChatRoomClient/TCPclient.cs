@@ -25,19 +25,14 @@ namespace ChatRoomClient
             {
                 Console.WriteLine("What is your name?");
                 name = Console.ReadLine();
-                
                 Console.WriteLine("Enter your message");
-                
                     string server;                    
                     server = "127.0.0.1";
                     string message;
                     Int32 port = 8002;
                      client = new TcpClient(server, port);
-                
                     stream = client.GetStream();
                 var User = Task.Run(() => GetMessage());
-                //Thread tank = new Thread(GetMessage);
-                //tank.Start();
                 while (true)
                 {
                     message = Console.ReadLine();
@@ -45,12 +40,7 @@ namespace ChatRoomClient
                     Byte[] data = Encoding.ASCII.GetBytes(output);
                     stream.Write(data, 0, data.Length);
                     Console.WriteLine("message sent");
-                    //string responseData = String.Empty;
-                    //Int32 bytes = stream.Read(data, 0, data.Length);
-                    //responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-                    //Console.WriteLine("{0}", responseData);
-                }
-                                      
+                }                
             }
             catch (ArgumentNullException e)
             {
@@ -60,12 +50,9 @@ namespace ChatRoomClient
             {
                 Console.WriteLine("Disconnected");
             }
-
-            
         }
         public void GetMessage()
         {
-
             if (stream.CanRead)
             {
                 try
@@ -89,9 +76,6 @@ namespace ChatRoomClient
             {
 
             }
-            //stream.Close(5);
-            //client.Connect("127.0.0.1",8002);
-            //client.GetStream();
         }
     }
 }

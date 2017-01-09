@@ -10,12 +10,9 @@ namespace ChatRoomClient
     {
         static void Main(string[] args)
         {
-
             TCPclients duh = new TCPclients();
             duh.Main();
-            
             Console.ReadKey();
-
         }
     }
 }

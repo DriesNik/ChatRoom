@@ -17,9 +17,7 @@ namespace ChatRoom
         public static Dictionary<string, int> clientDictionary = new Dictionary<string, int>();
         public static List<Users> users;
         public static TcpListener server;
-        //public static System.IO.StreamWriter file;
-
-
+        //public static System.IO.StreamWriter file
         public  void Main()
         {
             try
@@ -33,7 +31,6 @@ namespace ChatRoom
                 Console.WriteLine("Waiting for a connection... ");
                 var t = Task.Run(() => ListenThread());
                 var z = Task.Run(() => Messages());
-                
                 t.Wait();   
             }
             catch (SocketException e)
@@ -49,10 +46,6 @@ namespace ChatRoom
             Console.WriteLine("\nHit enter to continue...");
             Console.Read();
         }
-        //public void MakeLog()
-        //{
-        //    file = new System.IO.StreamWriter(@"Logs.txt");
-        //}
         static void ListenThread()
         {
             while (true)
@@ -63,10 +56,8 @@ namespace ChatRoom
                     UserJoin();
                     Users user = new Users(server.AcceptTcpClient().GetStream());
                     users.Add(user);
-                    
-                    
                     var q = Task.Run(() => user.Reading());
-                    //Parallel.Invoke(Messages, user.Reading);
+                    
                 }
             }
         }
@@ -94,11 +85,8 @@ namespace ChatRoom
                 {
                     string words = messageQueue.Dequeue();
                     Writing(words);
-                    
-                    
                     foreach (Users user in users)
                     {
-                        
                         user.Update(words);
                     }
                 }
@@ -109,7 +97,5 @@ namespace ChatRoom
             }
             
         }
-        
-       
     }
 }

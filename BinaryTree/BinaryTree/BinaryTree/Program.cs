@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatRoom
+namespace BinaryTreee
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Server server = new Server();
-            server.Main();
-            Console.ReadKey();
+            BinaryTree<string> Pain = new BinaryTree<string>();
+            Pain.Insert("hi");
+            Pain.Insert("i dont know");
+
         }
     }
 }
