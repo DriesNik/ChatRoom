@@ -1,0 +1,4 @@
+Single responsibility.
+my TCPclient class is only responsible for sending and recieving messages.
+
+my Users class is responsible for checking for messages and sending them back

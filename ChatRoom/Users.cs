@@ -27,7 +27,7 @@ namespace ChatRoom
             }
             catch (ArgumentNullException)
             {
-                Console.WriteLine("error");
+                Console.WriteLine("Error");
             }
         }
         public void Reading()
@@ -46,7 +46,7 @@ namespace ChatRoom
             }
             catch (IOException)
             {
-                Console.WriteLine("user has left");
+                Console.WriteLine("A User has left");
             }
         }
     }

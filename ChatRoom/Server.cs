@@ -28,10 +28,10 @@ namespace ChatRoom
                 server = new TcpListener(localAddr, port);
                 server.Start();
                 //MakeLog();
-                Console.WriteLine("Waiting for a connection... ");
-                var t = Task.Run(() => ListenThread());
-                var z = Task.Run(() => Messages());
-                t.Wait();   
+                Console.WriteLine("Waiting for a connection. ");
+                var listen = Task.Run(() => ListenThread());
+                var messaging = Task.Run(() => Messages());
+                listen.Wait();   
             }
             catch (SocketException e)
             {
@@ -39,11 +39,11 @@ namespace ChatRoom
             }
             finally
             {
-                Console.WriteLine("finnaly bit");
+                Console.WriteLine("The Server has closed.");
                 server.Stop();
             }
-            Console.WriteLine("end server");
-            Console.WriteLine("\nHit enter to continue...");
+            //Console.WriteLine("end server");
+            Console.WriteLine("\nHit enter to continue.");
             Console.Read();
         }
         static void ListenThread()
@@ -74,7 +74,7 @@ namespace ChatRoom
         {
             foreach (Users user in users)
             {
-                user.Update("A User has joined the channel");
+                user.Update("A User has joined the channel.");
             }
         }
         public static void Messages()
