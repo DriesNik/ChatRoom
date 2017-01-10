@@ -11,6 +11,7 @@ namespace ChatRoom
 {
     class Users
     {
+        public string name;
         private NetworkStream accept;
         public Users(NetworkStream accept)
         {
@@ -32,11 +33,11 @@ namespace ChatRoom
         }
         public void StartUp()
         {
-            //var naming = Task.Run(() => GetName());
-            //naming.Wait();
-            
-                var q = Task.Run(() => Reading());
-            
+            var startReading = Task.Run(() => Reading());
+        }
+        public string ReturnName()
+        {
+            return name;
         }
         public string GetName()
         {
@@ -48,7 +49,8 @@ namespace ChatRoom
                 i = accept.Read(bytes, 0, bytes.Length);
                 {
                     data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                    Console.WriteLine("success");
+                    //Console.WriteLine("success");
+                    name = data;
                 }
             }
             catch (IOException)
@@ -61,19 +63,22 @@ namespace ChatRoom
         {
             Byte[] bytes = new Byte[256];
             string data = null;
+            string fullMessage;
             int i;
             try
             {
                 while ((i = accept.Read(bytes, 0, bytes.Length)) != 1)
                 {
                     data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                    Console.WriteLine("Received: {0}", data);
+                    data = (name + " : " + data);
+                    Console.WriteLine("Recieved : {0}", data);
+                    //data = ("{0} : {1}", name ,data);
                     Server.messageQueue.Enqueue(data);
                 }
             }
             catch (IOException)
             {
-                Console.WriteLine("A User has left");
+                Console.WriteLine(name + " has left");
             }
         }
     }

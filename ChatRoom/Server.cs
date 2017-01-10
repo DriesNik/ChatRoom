@@ -46,8 +46,8 @@ namespace ChatRoom
         }
         static void AddingUserThread( Users info)
         {
-            var q = Task.Run(() => clientDictionary.Add(info.GetName(), info));
-            q.Wait();          
+            var addingClient = Task.Run(() => clientDictionary.Add(info.GetName(), info));
+            addingClient.Wait();          
             info.StartUp();
             UserJoin();
         }
@@ -57,16 +57,10 @@ namespace ChatRoom
             {
                 while (server.Pending() == true)
                 {
-                    Console.WriteLine("A User has joined your server!");
+                    Console.WriteLine("A User Connected");
                     
                     Users user = new Users(server.AcceptTcpClient().GetStream());
-                    var q = Task.Run(() => AddingUserThread(/*user.GetName(),*/ user));
-                    //user.StartUp();
-                    //clientDictionary.Add(user.GetName(),user);
-
-                    //users.Add(user);
-                    //var q = Task.Run(() => user.Reading());
-
+                    var addingUser = Task.Run(() => AddingUserThread(/*user.GetName(),*/ user));
                 }
             }
         }
@@ -82,8 +76,7 @@ namespace ChatRoom
         {
             foreach (var users in clientDictionary.Values)
             {
-                
-                users.Update("A User has joined the channel.");
+                users.Update(users.ReturnName() +" has joined the channel.");
             }
         }
         public static void Messages()
@@ -100,9 +93,7 @@ namespace ChatRoom
                     }
                 }
                 else
-                {
-
-                }
+                { }
             }
             
         }

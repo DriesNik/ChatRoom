@@ -31,7 +31,6 @@ namespace ChatRoomClient
                 stream = client.GetStream();
                 Console.WriteLine("What is your name?");
                     sendName = Console.ReadLine();
-                    
                     Byte[] nameData = Encoding.ASCII.GetBytes(sendName);
                     stream.Write(nameData, 0, nameData.Length);   
                 Console.WriteLine("Enter your message");
@@ -40,7 +39,8 @@ namespace ChatRoomClient
                 while (true)
                 {
                     message = Console.ReadLine();
-                    string output = (sendName + ": " + message);
+                    //string output = (sendName + ": " + message);
+                    string output = (message);
                     Byte[] data = Encoding.ASCII.GetBytes(output);
                     stream.Write(data, 0, data.Length);
                     Console.WriteLine("message sent");
